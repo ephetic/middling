@@ -1,7 +1,7 @@
 {
   "name": "middling",
   "version": "1.0.0",
-  "description": "Simple recursive middleware chain",
+  "description": "a simple recursive middleware chainer",
   "main": "index.js",
   "scripts": {
     "test": "tape test"
@@ -10,6 +10,10 @@
     "middleware"
   ],
   "author": "Brian Cleary",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ephetic/middling.git"
+  },  
   "license": "ISC",
   "devDependencies": {
     "rewire": "^2.5.2",
