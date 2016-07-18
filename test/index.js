@@ -5,6 +5,7 @@ const tape = require('tape')
 const midl = rewire('../')
 
 tape('it behaves well with no fns provided', t => {
+  t.plan(1)
   const chain = midl()
   chain(null, null, () => {
     t.pass('nothing bad happened')
@@ -13,13 +14,14 @@ tape('it behaves well with no fns provided', t => {
 })
 
 tape('it accepts [fns] and fns...', t => {
-  const args = midl.__get__('args')
+  const args = midl.__get__('desplat')
   const fns = [() => {}, () => {}]
-  t.deepEquals(args(fns), args.call(null, fns), '===')
+  t.deepEquals(args(fns), args.call(null, fns), 'it should have converted splat to array')
   t.end()
 })
 
 tape('it calls fns in order', t => {
+  t.plan(4)
   const fn1 = (req, res, next) => { 
     t.notOk(res.fn2Called, 'fn2 should not have been called first')
     res.fn1Called = true; 
@@ -40,6 +42,7 @@ tape('it calls fns in order', t => {
 })
 
 tape('it should abort the chain on err', t => {
+  t.plan(3)
   const fn1 = (req, res, next) => { 
     t.notOk(res.fn2Called, 'fn2 should not have been called first')
     res.fn1Called = true; 
@@ -59,21 +62,23 @@ tape('it should abort the chain on err', t => {
 })
 
 tape('it can chain chains', t => {
+  t.plan(2)
   const c1 = midl()
-  const c2 = midl((req, res, next) => { res.c2 = true; next() })
-  const c3 = midl((req, res, next) => { res.c3 = true; next() })
+  const c2 = midl((req, res, next) => { res.c2 = (res.c2||0) + 1; next() })
+  const c3 = midl((req, res, next) => { res.c3 = (res.c3||0) + 1;; next() })
 
   const chain = midl(c2, c1, c3)
   const res = {}
   chain({}, res, () => {
-    t.ok(res.c2, 'c2 should have been run')
-    t.ok(res.c3, 'c3 should have been run')
+    t.equals(res.c2, 1, 'c2 should have been run once')
+    t.equals(res.c3, 1, 'c3 should have been run once')
     t.end()
   })
 
 })
 
 tape('it treats fns as synchronous if next is omitted', t => {
+  t.plan(4)
   const fn1 = (req, res, next) => { 
     t.notOk(res.fn2Called, 'fn2 should not have been called first')
     res.fn1Called = true; 

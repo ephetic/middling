@@ -3,26 +3,38 @@
  * splat of middleware functions.
  *
  * @param {Array(Function)|Function...}
- * @return {Function} fn(req, res, next)
+ * @return {Function} fn(req, res, done)
  */
 module.exports = function () {
-  var fns = args(arguments)
-  return function (req, res, next) {
+  var fns = desplat(arguments)
+  return function () {
+    var args = Array.apply(null, arguments)
+    if (args[args.length - 1] instanceof Function)
+      var done = once(args.pop())
     var ix = 0
-    inner()
+    next()
 
-    function inner(err) {
+    function next(err) {
       var fn = fns[ix++]
-      if (err || !fn) 
-        return next && next(err)
-      fn(req, res, inner)
-      if (fn.length === 2) inner()
+      if (err || !fn) return done && done(err)
+
+      fn.apply(null, args.concat(next))
+      if (fn.length <= args.length) next()
     }
   }
 }
 
-function args (params) {
-  return (params[0] instanceof Array
+function desplat (params) {
+  return params[0] instanceof Array
     ? params[0] 
-    : Array.apply(null, params));
+    : Array.apply(null, params);
+}
+
+function once (fn) {
+  var called = false
+  return function() {
+    if (called) return
+    called = true
+    fn.apply(null, arguments)
+  }
 }
