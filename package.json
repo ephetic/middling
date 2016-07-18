@@ -1,0 +1,18 @@
+{
+  "name": "middling",
+  "version": "1.0.0",
+  "description": "Simple recursive middleware chain",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test"
+  },
+  "keywords": [
+    "middleware"
+  ],
+  "author": "Brian Cleary",
+  "license": "ISC",
+  "devDependencies": {
+    "rewire": "^2.5.2",
+    "tape": "^4.6.0"
+  }
+}
